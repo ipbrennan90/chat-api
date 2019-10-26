@@ -1,0 +1,10 @@
+{
+  "name": "y",
+  "version": "y",
+  "description": "Chat api example written in Node with the Express framework",
+  "main": "y",
+  "repository": "https://github.com/ipbrennan90/chat-api",
+  "author": "Ian Brennan",
+  "license": "y",
+  "private": false
+}
