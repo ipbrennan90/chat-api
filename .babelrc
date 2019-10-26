@@ -8,5 +8,14 @@
         }
       }
     ]
-  ]
+  ],
+  "env": {
+    "development": {
+      "presets": [],
+      "ignore": ["./tests/*", "./database/*", "jest.config.js"]
+    },
+    "test": {
+      "presets": []
+    }
+  }
 }

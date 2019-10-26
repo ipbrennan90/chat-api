@@ -1,7 +1,9 @@
-import express from "express";
-const app = express();
-const port = 3000;
+import dotenv from 'dotenv'
 
-app.get("/", (req, res) => res.send("Hello World!"));
+dotenv.config()
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+import server from './server'
+
+const PORT = process.env.PORT || 3000
+
+server.listen(PORT, () => console.log(`Server is live at localhost:${PORT}`))

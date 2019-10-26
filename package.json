@@ -4,11 +4,13 @@
   "description": "Chat api example written in Node with the Express framework",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "NODE_ENV=test jest --testTimeout=10000",
+    "pretest": "NODE_ENV=test yarn db:migrate:reset",
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules",
-    "start": "yarn build && node dist/index.js",
+    "start": "NODE_ENV=development yarn build && node dist/index.js",
     "db:create": "createdb chat_api_dev || true && createdb chat_api_test || true",
-    "db:migrate": "node_modules/.bin/sequelize db:migrate",
+    "db:migrate": "npx sequelize-cli db:migrate",
+    "db:migrate:reset": "npx sequelize-cli db:migrate:undo:all && yarn db:migrate",
     "db:setup": "yarn db:create && yarn db:migrate"
   },
   "repository": "https://github.com/ipbrennan90/chat-api",
