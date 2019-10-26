@@ -1,10 +1,22 @@
 {
-  "name": "y",
-  "version": "y",
+  "name": "chat-api",
+  "version": "0",
   "description": "Chat api example written in Node with the Express framework",
-  "main": "y",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules",
+    "start": "yarn build && node dist/index.js"
+  },
   "repository": "https://github.com/ipbrennan90/chat-api",
   "author": "Ian Brennan",
-  "license": "y",
-  "private": false
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "rimraf": "^3.0.0"
+  }
 }
