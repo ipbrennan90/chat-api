@@ -1,0 +1,21 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+        "targets": {
+          "node": "current"
+        }
+      }
+    ]
+  ],
+  "env": {
+    "development": {
+      "presets": [],
+      "ignore": ["./tests/*", "./database/*", "jest.config.js"]
+    },
+    "test": {
+      "presets": []
+    }
+  }
+}
