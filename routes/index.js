@@ -1,9 +1,13 @@
 import { Router } from 'express'
+import { EventController } from '../controllers'
+import requireParams from '../utils/require_params'
 
 const router = Router()
 
-router.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+router.post(
+  '/events',
+  requireParams(['date', 'user', 'type']),
+  EventController.create
+)
 
 export default router

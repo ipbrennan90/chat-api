@@ -12,7 +12,7 @@
   "env": {
     "development": {
       "presets": [],
-      "ignore": ["./tests/*", "./database/*", "jest.config.js"]
+      "ignore": ["./tests/*", "jest.config.js"]
     },
     "test": {
       "presets": []
