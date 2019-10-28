@@ -18,6 +18,17 @@ const EventController = {
       console.warn(e)
       return res.status(500).json({ status: 'error' })
     }
+  },
+  clear: async (req, res) => {
+    try {
+      await Event.destroy({ where: {} })
+      return res.status(200).json({
+        status: 'ok'
+      })
+    } catch (e) {
+      console.warn(e)
+      return res.status(500).json({ status: 'error' })
+    }
   }
 }
 
