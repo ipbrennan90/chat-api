@@ -10,4 +10,6 @@ router.post(
   EventController.create
 )
 
+router.post('/events/clear', EventController.clear)
+
 export default router
