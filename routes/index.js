@@ -18,4 +18,10 @@ router.get(
   EventController.index
 )
 
+router.get(
+  '/events/summary',
+  requireParams(['from', 'to', 'by'], true),
+  EventController.summary
+)
+
 export default router

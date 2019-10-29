@@ -1,5 +1,6 @@
 'use strict'
 import { eventSerializer } from '../serializers'
+import { Op } from 'sequelize'
 import serialize from '../../utils/serialize'
 
 module.exports = (sequelize, DataTypes) => {
@@ -28,8 +29,48 @@ module.exports = (sequelize, DataTypes) => {
     return serialize(this, serializer)
   }
 
-  Event.associate = function(models) {
-    // associations can be defined here
+  Event.summary = (from, to, by) => {
+    return Event.findAll({
+      where: {
+        date: {
+          [Op.between]: [from, to]
+        }
+      },
+      attributes: [
+        [sequelize.fn('date_trunc', by, sequelize.col('date')), by],
+        [
+          sequelize.fn(
+            'sum',
+            sequelize.literal("case when type='HIGHFIVE' then 1 else 0 end")
+          ),
+          'highfives'
+        ],
+        [
+          sequelize.fn(
+            'sum',
+            sequelize.literal("case when type='COMMENT' then 1 else 0 end")
+          ),
+          'comments'
+        ],
+        [
+          sequelize.fn(
+            'sum',
+            sequelize.literal("case when type='LEAVE' then 1 else 0 end")
+          ),
+          'leaves'
+        ],
+        [
+          sequelize.fn(
+            'sum',
+            sequelize.literal("case when type='ENTER' then 1 else 0 end")
+          ),
+          'enters'
+        ]
+      ],
+      group: [by],
+      raw: true,
+      order: sequelize.literal(`${by} ASC`)
+    })
   }
 
   return Event

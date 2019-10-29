@@ -155,31 +155,46 @@ describe('EventController', () => {
 
   describe('with multiple events', () => {
     beforeEach(async () => {
-      const createEvents = [
-        Event.create({
-          date: '2019-10-31T09:00:00Z',
+      await Event.bulkCreate([
+        {
+          date: '2019-10-31T09:00:55Z',
+          user: 'Biff',
+          type: 'LEAVE'
+        },
+        {
+          date: '2019-10-31T09:00:40Z',
           user: 'Marty',
           type: 'ENTER'
-        }),
-        Event.create({
+        },
+        {
+          date: '2019-10-31T09:00:30Z',
+          user: 'Marty',
+          type: 'ENTER'
+        },
+        {
           date: '2019-10-31T09:01:00Z',
           user: 'Marty',
           type: 'LEAVE'
-        }),
-        Event.create({
+        },
+        {
           date: '2019-10-31T09:02:00Z',
           user: 'Marty',
           type: 'HIGHFIVE',
           otheruser: 'Doc'
-        }),
-        Event.create({
+        },
+        {
           date: '2019-10-31T09:03:00Z',
           user: 'Doc',
           type: 'COMMENT',
           message: 'Sup marty??'
-        })
-      ]
-      await Promise.all(createEvents)
+        },
+        {
+          date: '2019-11-01T09:03:00Z',
+          user: 'Doc',
+          type: 'COMMENT',
+          message: 'Sup marty??'
+        }
+      ])
     })
 
     describe('#clear', () => {
@@ -189,7 +204,7 @@ describe('EventController', () => {
         const endEventCount = await Event.count()
         expect(res.statusCode).toEqual(200)
         expect(res.body).toEqual({ status: 'ok' })
-        expect(beginEventCount).toEqual(4)
+        expect(beginEventCount).toEqual(7)
         expect(endEventCount).toEqual(0)
       })
     })
@@ -204,20 +219,30 @@ describe('EventController', () => {
           expect(res.body).toEqual({
             events: [
               {
-                date: '2019-10-31T09:00:00Z',
-                type: 'enter',
-                user: 'Marty'
+                date: '2019-10-31T09:00:30Z',
+                user: 'Marty',
+                type: 'enter'
+              },
+              {
+                date: '2019-10-31T09:00:40Z',
+                user: 'Marty',
+                type: 'enter'
+              },
+              {
+                date: '2019-10-31T09:00:55Z',
+                user: 'Biff',
+                type: 'leave'
               },
               {
                 date: '2019-10-31T09:01:00Z',
-                type: 'leave',
-                user: 'Marty'
+                user: 'Marty',
+                type: 'leave'
               },
               {
                 date: '2019-10-31T09:02:00Z',
-                otheruser: 'Doc',
+                user: 'Marty',
                 type: 'highfive',
-                user: 'Marty'
+                otheruser: 'Doc'
               },
               {
                 date: '2019-10-31T09:03:00Z',
@@ -237,14 +262,24 @@ describe('EventController', () => {
           expect(res.body).toEqual({
             events: [
               {
-                date: '2019-10-31T09:00:00Z',
-                type: 'enter',
-                user: 'Marty'
+                date: '2019-10-31T09:00:30Z',
+                user: 'Marty',
+                type: 'enter'
+              },
+              {
+                date: '2019-10-31T09:00:40Z',
+                user: 'Marty',
+                type: 'enter'
+              },
+              {
+                date: '2019-10-31T09:00:55Z',
+                user: 'Biff',
+                type: 'leave'
               },
               {
                 date: '2019-10-31T09:01:00Z',
-                type: 'leave',
-                user: 'Marty'
+                user: 'Marty',
+                type: 'leave'
               }
             ]
           })
@@ -264,6 +299,115 @@ describe('EventController', () => {
           )
           expect(res.statusCode).toEqual(400)
           expect(res.body).toEqual({ status: 'error' })
+        })
+      })
+    })
+
+    describe('#summary', () => {
+      describe('when successful', () => {
+        it('returns a summation of the events by minute', async () => {
+          const res = await request(app).get(
+            '/events/summary?from=2019-10-31T09:00:00Z&to=2019-10-31T09:03:00Z&by=minute'
+          )
+          expect(res.statusCode).toEqual(200)
+          expect(res.body).toEqual({
+            events: [
+              {
+                date: '2019-10-31T09:00:00Z',
+                enters: 2,
+                leaves: 1,
+                comments: 0,
+                highfives: 0
+              },
+              {
+                date: '2019-10-31T09:01:00Z',
+                enters: 0,
+                leaves: 1,
+                comments: 0,
+                highfives: 0
+              },
+              {
+                date: '2019-10-31T09:02:00Z',
+                enters: 0,
+                leaves: 0,
+                comments: 0,
+                highfives: 1
+              },
+              {
+                date: '2019-10-31T09:03:00Z',
+                enters: 0,
+                leaves: 0,
+                comments: 1,
+                highfives: 0
+              }
+            ]
+          })
+        })
+
+        it('returns a summation of the events by hour', async () => {
+          const res = await request(app).get(
+            '/events/summary?from=2019-10-31T09:00:00Z&to=2019-10-31T10:00:00Z&by=hour'
+          )
+          expect(res.statusCode).toEqual(200)
+          expect(res.body).toEqual({
+            events: [
+              {
+                date: '2019-10-31T09:00:00Z',
+                enters: 2,
+                leaves: 2,
+                comments: 1,
+                highfives: 1
+              }
+            ]
+          })
+        })
+
+        it('returns a summation of the events by day', async () => {
+          const res = await request(app).get(
+            '/events/summary?from=2019-10-31T09:00:00Z&to=2019-11-01T10:00:00Z&by=day'
+          )
+          expect(res.statusCode).toEqual(200)
+          expect(res.body).toEqual({
+            events: [
+              {
+                date: '2019-10-31T00:00:00Z',
+                enters: 2,
+                leaves: 2,
+                comments: 1,
+                highfives: 1
+              },
+              {
+                date: '2019-11-01T00:00:00Z',
+                comments: 1,
+                enters: 0,
+                highfives: 0,
+                leaves: 0
+              }
+            ]
+          })
+        })
+      })
+
+      describe('when not successful', () => {
+        it('returns a 400 if from is missing from parameters', async () => {
+          const res = await request(app).get(
+            '/events/summary?to=2019-10-31T09:03:00Z&by=minute'
+          )
+          expect(res.statusCode).toEqual(400)
+        })
+
+        it('returns a 400 if to is missing from parameters', async () => {
+          const res = await request(app).get(
+            '/events/summary?from=2019-10-31T09:00:00Z&by=minute'
+          )
+          expect(res.statusCode).toEqual(400)
+        })
+
+        it('returns a 400 if by is missing from parameters', async () => {
+          const res = await request(app).get(
+            '/events/summary?from=2019-10-31T09:00:00Z&to=2019-10-31T09:03:00Z'
+          )
+          expect(res.statusCode).toEqual(400)
         })
       })
     })

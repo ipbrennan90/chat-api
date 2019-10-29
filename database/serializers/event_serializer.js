@@ -1,15 +1,11 @@
-import { DateTime } from 'luxon'
+import { iso8601 } from '../../utils/date_formatter'
+
 const base = {
   options: {
     attributes: ['date', 'type', 'user']
   },
   type: type => type.toLowerCase(),
-  date: date => {
-    debugger
-    return DateTime.fromJSDate(date)
-      .toUTC()
-      .toFormat("yyyy-LL-dd'T'hh:mm:ss'Z'")
-  }
+  date: iso8601
 }
 
 const comment = {

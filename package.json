@@ -11,13 +11,15 @@
     "db:create": "createdb chat_api_dev || true && createdb chat_api_test || true",
     "db:migrate": "npx sequelize-cli db:migrate",
     "db:migrate:reset": "npx sequelize-cli db:migrate:undo:all && yarn db:migrate",
-    "db:setup": "yarn db:create && yarn db:migrate"
+    "db:setup": "yarn db:create && yarn db:migrate",
+    "db:seed": "yarn build && node dist/seed.js"
   },
   "repository": "https://github.com/ipbrennan90/chat-api",
   "author": "Ian Brennan",
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "babel-preset-stage-2": "^6.24.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "luxon": "^1.19.3",

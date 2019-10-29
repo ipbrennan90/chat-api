@@ -11,10 +11,13 @@ const paramsExist = (params, paramsContainer) => {
 
 const requireParams = (params, query = false) => (req, res, next) => {
   let paramsContainer = req.body
+
   if (query) {
     paramsContainer = req.query
   }
+
   const [paramsMissing, missingParams] = paramsExist(params, paramsContainer)
+
   if (!paramsMissing) {
     next()
   } else {
