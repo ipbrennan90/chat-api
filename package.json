@@ -1,6 +1,9 @@
 {
   "name": "chat-api",
   "version": "0",
+  "engines": {
+    "node": ">=10.0.0"
+  },
   "description": "Chat api example written in Node with the Express framework",
   "main": "index.js",
   "scripts": {
@@ -12,7 +15,7 @@
     "db:migrate": "npx sequelize-cli db:migrate",
     "db:migrate:reset": "npx sequelize-cli db:migrate:undo:all && yarn db:migrate",
     "db:setup": "yarn db:create && yarn db:migrate",
-    "db:seed": "yarn build && node dist/seed.js"
+    "db:seed": "babel-node dist/seed.js"
   },
   "repository": "https://github.com/ipbrennan90/chat-api",
   "author": "Ian Brennan",
