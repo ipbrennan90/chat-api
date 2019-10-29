@@ -12,4 +12,10 @@ router.post(
 
 router.post('/events/clear', EventController.clear)
 
+router.get(
+  '/events',
+  requireParams(['from', 'to'], true),
+  EventController.index
+)
+
 export default router

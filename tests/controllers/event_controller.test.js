@@ -153,34 +153,119 @@ describe('EventController', () => {
     })
   })
 
-  describe('#clear', () => {
-    it('clears all events in database', async () => {
+  describe('with multiple events', () => {
+    beforeEach(async () => {
       const createEvents = [
         Event.create({
-          date: '2019-10-31T09:03:00Z',
+          date: '2019-10-31T09:00:00Z',
           user: 'Marty',
           type: 'ENTER'
         }),
         Event.create({
-          date: '2019-10-31T09:03:00Z',
+          date: '2019-10-31T09:01:00Z',
           user: 'Marty',
           type: 'LEAVE'
         }),
         Event.create({
-          date: '1985-10-26T09:03:00Z',
+          date: '2019-10-31T09:02:00Z',
           user: 'Marty',
           type: 'HIGHFIVE',
           otheruser: 'Doc'
+        }),
+        Event.create({
+          date: '2019-10-31T09:03:00Z',
+          user: 'Doc',
+          type: 'COMMENT',
+          message: 'Sup marty??'
         })
       ]
       await Promise.all(createEvents)
-      const beginEventCount = await Event.count()
-      const res = await request(app).post('/events/clear')
-      const endEventCount = await Event.count()
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toEqual({ status: 'ok' })
-      expect(beginEventCount).toEqual(3)
-      expect(endEventCount).toEqual(0)
+    })
+
+    describe('#clear', () => {
+      it('clears all events in database', async () => {
+        const beginEventCount = await Event.count()
+        const res = await request(app).post('/events/clear')
+        const endEventCount = await Event.count()
+        expect(res.statusCode).toEqual(200)
+        expect(res.body).toEqual({ status: 'ok' })
+        expect(beginEventCount).toEqual(4)
+        expect(endEventCount).toEqual(0)
+      })
+    })
+
+    describe('#index', () => {
+      describe('when successful', () => {
+        it('returns a list of all events in ascending order by date', async () => {
+          const res = await request(app).get(
+            '/events?from=2019-10-31T09:00:00Z&to=2019-10-31T09:03:00Z'
+          )
+          expect(res.statusCode).toEqual(200)
+          expect(res.body).toEqual({
+            events: [
+              {
+                date: '2019-10-31T09:00:00Z',
+                type: 'enter',
+                user: 'Marty'
+              },
+              {
+                date: '2019-10-31T09:01:00Z',
+                type: 'leave',
+                user: 'Marty'
+              },
+              {
+                date: '2019-10-31T09:02:00Z',
+                otheruser: 'Doc',
+                type: 'highfive',
+                user: 'Marty'
+              },
+              {
+                date: '2019-10-31T09:03:00Z',
+                user: 'Doc',
+                type: 'comment',
+                message: 'Sup marty??'
+              }
+            ]
+          })
+        })
+
+        it('returns only the dates within the time frame', async () => {
+          const res = await request(app).get(
+            '/events?from=2019-10-31T09:00:00Z&to=2019-10-31T09:01:00Z'
+          )
+          expect(res.statusCode).toEqual(200)
+          expect(res.body).toEqual({
+            events: [
+              {
+                date: '2019-10-31T09:00:00Z',
+                type: 'enter',
+                user: 'Marty'
+              },
+              {
+                date: '2019-10-31T09:01:00Z',
+                type: 'leave',
+                user: 'Marty'
+              }
+            ]
+          })
+        })
+      })
+
+      describe('when not successful', () => {
+        it('returns a 400 if from missing from params', async () => {
+          const res = await request(app).get('/events?to=2019-10-31T09:01:00Z')
+          expect(res.statusCode).toEqual(400)
+          expect(res.body).toEqual({ status: 'error' })
+        })
+
+        it('returns a 400 if to missing from params', async () => {
+          const res = await request(app).get(
+            '/events?from=2019-10-31T09:00:00Z'
+          )
+          expect(res.statusCode).toEqual(400)
+          expect(res.body).toEqual({ status: 'error' })
+        })
+      })
     })
   })
 })
